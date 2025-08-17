@@ -167,27 +167,25 @@ const verifyCaptcha = async (req, res) => {
 };
 
 const resendOTP = asyncHandler(async (req, res) => {
-    sessionMiddleware(req, res, async () => {
-        if (!req.session.userData) {
-            throw new ApiError(400, "User data not found in session. Please start registration again.");
-        }
+    if (!req.session.userData) {
+        throw new ApiError(400, "User data not found in session. Please start registration again.");
+    }
 
-        const { studentEmail } = req.session.userData;
-        const newOtp = generateOtp();
+    const { studentEmail } = req.session.userData;
+    const newOtp = generateOtp();
 
-        const otpExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes
-        req.session.otp = newOtp;
-        req.session.otpExpiry = otpExpiry;
-        req.session.userData.otpExpiry = otpExpiry; //update the otpExpiry in userData
+    const otpExpiry = Date.now() + 3 * 60 * 1000; // 3 minutes
+    req.session.otp = newOtp;
+    req.session.otpExpiry = otpExpiry;
+    req.session.userData.otpExpiry = otpExpiry; // update otpExpiry
 
+    const otpSent = await sendOtp(studentEmail, newOtp);
+    if (!otpSent) {
+        throw new ApiError(500, "Failed to send OTP. Please try again.");
+    }
 
-        const otpSent = await sendOtp(studentEmail, newOtp);
-        if (!otpSent) {
-            throw new ApiError(500, "Failed to send OTP. Please try again.");
-        }
-
-        res.status(200).json(new ApiResponse(200, { studentEmail }, "OTP resent successfully."));
-    });
+    res.status(200).json(new ApiResponse(200, { studentEmail }, "OTP resent successfully."));
 });
+
 
 export { registerStudent, verifyStudentRegistration,verifyCaptcha,resendOTP };
