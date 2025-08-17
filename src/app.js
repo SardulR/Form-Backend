@@ -20,10 +20,12 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
-            secure: process.env.NODE_ENV === "production",
-            httpOnly: true,
-            maxAge: 5 * 60 * 1000, // 5 minutes
-        },
+    secure: process.env.NODE_ENV === "production",  // only true in prod
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    httpOnly: true,
+    maxAge: 5 * 60 * 1000,
+}
+,
     })
 );
 
@@ -41,8 +43,10 @@ import userRegister from "./route/students.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { registerLimiter } from "./middlewares/rateLimiter.js";
 
-app.use("/api/v1/student", userRegister);
 app.use(registerLimiter);
+
+app.use("/api/v1/student", userRegister);
+
 app.use(errorHandler);
 
 export { app };
