@@ -63,7 +63,7 @@ const registerStudent = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Must Enter College Email Id Only");
     }
 
-    if (!studentNumber.startsWith('24')) {
+    if (!(studentNumber.startsWith('23') || studentNumber.startsWith('24'))) {
         throw new ApiError(401, "Unauthorized student Number");
     }
 
