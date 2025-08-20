@@ -161,15 +161,16 @@ const verifyStudentRegistration = asyncHandler(async (req, res) => {
 
     const email = req.session.userData.studentEmail;
 
-    const confSEnt = await sendConfirmation(email);
-    if (!confSEnt) {
-        throw new ApiError(500, "Failed to send OTP. Please try again.");
-    }
 
     const newStudent = await Student.create(req.session.userData);
 
     if (!newStudent) {
         throw new ApiError(500, "Failed to create student. Please try again.");
+    }
+
+        const confSEnt = await sendConfirmation(email);
+    if (!confSEnt) {
+        throw new ApiError(500, "Failed to send OTP. Please try again.");
     }
 
     // Clear session after successful registration
