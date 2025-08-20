@@ -33,11 +33,22 @@ function generateOtp() {
 }
                 async function sendOtp(email, otp) {
                     const mailOptions = {
-                        from: process.env.EMAIL, 
-                        to: email,                
-                        subject: 'Your OTP for Registration for The Turing Test-25', 
-                        text: `Your OTP is: ${otp}. It will expire in 3 minutes.\n\nRegards,\nMLCOE\nOwner` 
-                    };
+        from: process.env.EMAIL, 
+        to: email,                
+        subject: '[The Turing Test 2025] Your One-Time Password (OTP)', 
+        text: `Hello,
+
+Your One-Time Password (OTP) for completing registration for The Turing Test 2025 is:
+
+ OTP: ${otp}
+
+This code will expire in 3 minutes. Please do not share it with anyone for security reasons.
+
+If you did not request this, you can safely ignore this email.
+
+Best regards,
+MLCOE Team`
+    };
 
                     try {
                         await transporter.sendMail(mailOptions);
@@ -48,6 +59,35 @@ function generateOtp() {
                         return false;
                     }
                 }
+
+async function sendConfirmation(email) {
+    const mailVerifyOptions = {
+        from: process.env.EMAIL,
+        to: email,
+        subject: '[The Turing Test 2025] Registration Confirmed ✅',
+        text: `Hello,
+
+Congratulations! 🎉 Your registration for *The Turing Test 2025* has been successfully confirmed.
+
+We are excited to have you on board. Stay tuned for further updates and instructions leading up to the event.
+
+If you have any questions, feel free to reach out to us.
+
+Best regards,  
+MLCOE Team`
+    };
+    
+    try {
+                        await transporter.sendMail(mailVerifyOptions);
+                        console.log(`OTP sent to email: ${email}`);
+                        return true; 
+         } catch (error) {
+                        console.error('Error sending OTP email:', error);
+                        return false;
+                    }
+                }
+
+
 
 
 const registerStudent = asyncHandler(async (req, res) => {
@@ -117,6 +157,13 @@ const verifyStudentRegistration = asyncHandler(async (req, res) => {
         req.session.otpExpiry = null;
         req.session.userData = null;
         throw new ApiError(400, "OTP expired. Please restart registration.");
+    }
+
+    const email = req.session.userData.studentEmail;
+
+    const confSEnt = await sendConfirmation(email);
+    if (!confSEnt) {
+        throw new ApiError(500, "Failed to send OTP. Please try again.");
     }
 
     const newStudent = await Student.create(req.session.userData);

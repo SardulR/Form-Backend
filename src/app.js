@@ -21,6 +21,8 @@ app.use(
     })
 )
 
+app.set("trust proxy", 1);
+
 // 2. Session Middleware
 app.use(
     session({
@@ -29,7 +31,7 @@ app.use(
         saveUninitialized: false,
         cookie: {
     secure: true,  // only true in prod
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    sameSite:  "None",
     httpOnly: true,
     maxAge: 5 * 60 * 1000,
 }
