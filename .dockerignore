@@ -1,0 +1,20 @@
+# From your .gitignore
+.env
+./src/refreshToken.js
+
+# Node.js dependencies
+node_modules
+
+# Git and Docker files
+.git
+.gitignore
+Dockerfile
+.dockerignore
+
+# Logs
+npm-debug.log
+yarn-error.log
+
+# Editor/IDE config
+.vscode
+.idea
